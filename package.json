@@ -3,19 +3,33 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "serve": "pnpm tsc-serve && node server/lib",
-    "tsc-serve": "rm -rf server/lib/ && tsc server/index --outDir server/lib"
+    "tsc-serve": "rm -rf server/lib/ && tsc --newLine lf server/index --outDir server/lib",
+    "watch": "http-server clint/ -c-1 -p 8088",
+    "start": "webpack-dev-server --open --mode development",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
+    "eventemitter3": "^4.0.7",
     "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/uuid": "^8.3.4",
     "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.2"

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>webRTC</title>
+  </head>
+  <body>
+    <div class="webrtc">
+      <div class="myStream">
+        <div class="title" @dblclick="startVideo">me</div>
+
+        <div class="videoBox myVideo">
+          <video :srcObject="state.myUrl" autoplay></video>
+        </div>
+      </div>
+      <div class="otherStream">
+        <div>other</div>
+        <div class="videoBox otherVideo">
+          <video autoplay></video>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

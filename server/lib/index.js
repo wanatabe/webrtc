@@ -8,8 +8,10 @@ var port = 8089;
 var httpServer = (0, http_1.createServer)();
 var user = new Map();
 var io = new socket_io_1.Server(httpServer, {
-    /* options */
-    path: 'connection'
+    cors: {
+        origin: /http:\/\/localhost:\d+/,
+        credentials: true
+    }
 });
 io.on('connection', function (socket) {
     // ...
@@ -17,7 +19,7 @@ io.on('connection', function (socket) {
 });
 httpServer.on('request', function (req, res) {
     var _a;
-    if (!req.url)
+    if (!req.url || req.url === '/')
         return res.end('ok!');
     var param = url.parse(req.url);
     console.log('param :>> ', param);

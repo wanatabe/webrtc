@@ -9,8 +9,10 @@ const httpServer = createServer()
 const user = new Map()
 
 const io = new Server(httpServer, {
-  /* options */
-  path: 'connection'
+  cors: {
+    origin: /http:\/\/localhost:\d+/,
+    credentials: true
+  }
 })
 
 io.on('connection', (socket) => {
@@ -19,7 +21,7 @@ io.on('connection', (socket) => {
 })
 
 httpServer.on('request', function (req, res) {
-  if (!req.url) return res.end('ok!')
+  if (!req.url || req.url === '/') return res.end('ok!')
   const param = url.parse(req.url)
   console.log('param :>> ', param)
   if (param.pathname?.includes('login')) {

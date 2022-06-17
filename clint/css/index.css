@@ -1,0 +1,22 @@
+.webrtc {
+  display: flex;
+  justify-content: space-around;
+}
+.videoBox {
+  width: 600px;
+  height: 450px;
+  border: 1px solid;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.title::after {
+  content: '双击此处发起连接';
+  font-size: 12px;
+  color: coral;
+  padding-left: 6px;
+}
+textarea {
+  width: 100%;
+  margin-top: 8px;
+}
