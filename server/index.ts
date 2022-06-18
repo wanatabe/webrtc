@@ -1,16 +1,24 @@
-import { createServer } from 'http'
+import { createServer } from 'https'
 import { Server } from 'socket.io'
 import * as url from 'url'
 import { getIPv4, getOtherId, uuid } from './tool'
+import * as fs from 'fs'
+import path from 'path'
 
 const IPv4 = getIPv4()
 const port = 8089
 const user = new Map()
 
 // 创建http服务
-const httpServer = createServer((req, res) => {
-  res.setHeader('access-control-allow-origin', '*')
-})
+const httpServer = createServer(
+  {
+    key: fs.readFileSync(path.join(__dirname, '../../sslKey/test.key')),
+    cert: fs.readFileSync(path.join(__dirname, '../../sslKey/test.crt'))
+  },
+  (req, res) => {
+    res.setHeader('access-control-allow-origin', '*')
+  }
+)
 
 httpServer.on('request', function (req, res) {
   if (!req.url || req.url === '/') return res.end('ok!')
@@ -24,13 +32,13 @@ httpServer.on('request', function (req, res) {
 })
 
 httpServer.listen(port, () => {
-  console.log(`服务已启动： http://localhost:${port}\n http://${IPv4}:${port} `)
+  console.log(`服务已启动： https://localhost:${port}\n https://${IPv4}:${port} `)
 })
 
 // 创建websocket服务
 const io = new Server(httpServer, {
   cors: {
-    origin: new RegExp(`http://${IPv4}:\\d+`),
+    origin: new RegExp(`https://${IPv4}:\\d+`),
     credentials: true
   }
 })
@@ -45,6 +53,7 @@ io.on('connection', (socket) => {
   if (isLogin === 'boolean') {
     user.set(token, socket)
   }
+  console.log('连接成功：', token)
 
   socket.on('message', (code, data) => {
     reciveMsg(code, data, token)

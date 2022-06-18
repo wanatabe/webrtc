@@ -1,15 +1,47 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_1 = require("http");
+const https_1 = require("https");
 const socket_io_1 = require("socket.io");
-const url = require("url");
+const url = __importStar(require("url"));
 const tool_1 = require("./tool");
+const fs = __importStar(require("fs"));
+const path_1 = __importDefault(require("path"));
 const IPv4 = (0, tool_1.getIPv4)();
 const port = 8089;
-const httpServer = (0, http_1.createServer)((req, res) => {
+const user = new Map();
+// 创建http服务
+const httpServer = (0, https_1.createServer)({
+    key: fs.readFileSync(path_1.default.join(__dirname, '../../sslKey/test.key')),
+    cert: fs.readFileSync(path_1.default.join(__dirname, '../../sslKey/test.crt'))
+}, (req, res) => {
     res.setHeader('access-control-allow-origin', '*');
 });
-const user = new Map();
 httpServer.on('request', function (req, res) {
     if (!req.url || req.url === '/')
         return res.end('ok!');
@@ -22,13 +54,12 @@ httpServer.on('request', function (req, res) {
     }
 });
 httpServer.listen(port, () => {
-    console.log(`服务已启动： http://localhost:${port}\n http://${IPv4}:${port} `);
+    console.log(`服务已启动： https://localhost:${port}\n https://${IPv4}:${port} `);
 });
-console.log('reg :>> ', new RegExp(`http://${IPv4}:\\d+`));
+// 创建websocket服务
 const io = new socket_io_1.Server(httpServer, {
     cors: {
-        // origin: /http:\/\/:\d+/,
-        origin: new RegExp(`http://${IPv4}:\\d+`),
+        origin: new RegExp(`https://${IPv4}:\\d+`),
         credentials: true
     }
 });
@@ -43,6 +74,7 @@ io.on('connection', (socket) => {
     if (isLogin === 'boolean') {
         user.set(token, socket);
     }
+    console.log('连接成功：', token);
     socket.on('message', (code, data) => {
         reciveMsg(code, data, token);
     });

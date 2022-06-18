@@ -2,30 +2,14 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const webpack = require('webpack')
-const os = require('os')
-
-function getAddress() {
-	let ifaces = os.networkInterfaces()
-
-	for (let dev in ifaces) {
-		let iface = ifaces[dev]
-		if (!iface) continue
-
-		for (let i = 0; i < iface.length; i++) {
-			let { family, address, internal } = iface[i]
-
-			if (family === 'IPv4' && address !== '127.0.0.1' && !internal) {
-				return address
-			}
-		}
-	}
-}
+const webpack = require('webpack');
+const getAddress = require('./getIp');
 
 module.exports = (env) => {
 	const mode = env.production ? 'production' : 'development'
 	const host = getAddress()
 	console.log('env :>> ', host);
+	console.log(path.resolve('./server/key/test.key'));
 
 	return {
 		entry: { home: path.resolve(__dirname, 'clint/js/index.ts') },
@@ -58,7 +42,15 @@ module.exports = (env) => {
 		devServer: {
 			host,
 			static: './dist',
-			hot: true
+			hot: true,
+			server: {
+				type: 'https',
+				options: {
+					key: path.resolve('./sslKey/test.key'),
+					cert: path.resolve('./sslKey/test.crt'),
+					passphrase: 'webpack-dev-server'
+				},
+			}
 		},
 		plugins: [
 			new webpack.HotModuleReplacementPlugin(),
