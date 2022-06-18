@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "serve": "pnpm tsc-serve && node server/lib",
-    "tsc-serve": "rm -rf server/lib/ && tsc --newLine lf server/index --outDir server/lib",
+    "tsc-serve": "tsc --newLine lf --target ESNext --module commonjs server/index --outDir server/lib",
     "watch": "http-server clint/ -c-1 -p 8088",
     "start": "webpack-dev-server --open --mode development",
     "build": "webpack"
