@@ -3,9 +3,29 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack')
+const os = require('os')
+
+function getAddress() {
+	let ifaces = os.networkInterfaces()
+
+	for (let dev in ifaces) {
+		let iface = ifaces[dev]
+		if (!iface) continue
+
+		for (let i = 0; i < iface.length; i++) {
+			let { family, address, internal } = iface[i]
+
+			if (family === 'IPv4' && address !== '127.0.0.1' && !internal) {
+				return address
+			}
+		}
+	}
+}
 
 module.exports = (env) => {
 	const mode = env.production ? 'production' : 'development'
+	const host = getAddress()
+	console.log('env :>> ', host);
 
 	return {
 		entry: { home: path.resolve(__dirname, 'clint/js/index.ts') },
@@ -36,6 +56,7 @@ module.exports = (env) => {
 		},
 		mode,
 		devServer: {
+			host,
 			static: './dist',
 			hot: true
 		},
