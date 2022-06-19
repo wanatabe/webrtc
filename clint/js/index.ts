@@ -7,9 +7,8 @@ function createVideo(stream: MediaStream, selectors: string) {
   const video = document.createElement('video')
   video.srcObject = stream
 
-  video.autoplay = true
   video.onloadeddata = () => {
-    console.log('播放开始 ')
+    console.log('开始播放 ')
     video.play()
   }
 
@@ -18,11 +17,26 @@ function createVideo(stream: MediaStream, selectors: string) {
   } else {
     video.className = 'remote'
   }
+  // 为移动端添加控制条
+  if (navigator.userAgent.toUpperCase().includes('ANDROID')) {
+    video.controls = true
+  }
 
   const videoBox = document.querySelector<HTMLElement>(selectors)
   if (!videoBox) return
   videoBox.appendChild(video)
 }
+
+/**
+ * 解决移动端无法自动播放问题
+ * error： play() can only be initiated by a user gesture.
+ */
+document.addEventListener('click', () => {
+  const videoList = document.getElementsByTagName('video')
+  for (const video of videoList) {
+    video.play()
+  }
+})
 
 const baseUrl = `${location.protocol}//${location.hostname}:8089`
 
