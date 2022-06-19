@@ -67,14 +67,12 @@ io.on('connection', (socket) => {
     // 连接时触发
     /** 获取token，客户端为设置token时断开连接 */
     const token = socket.handshake.headers.token;
-    if (!token)
+    if (!token || !user.get(token))
         return socket.disconnect();
     /** 记录用户及连接 */
-    const isLogin = typeof user.get(token);
-    if (isLogin === 'boolean') {
-        user.set(token, socket);
-    }
     console.log('连接成功：', token);
+    user.set(token, socket.id);
+    sendMsg({ code: 'join', id: token });
     socket.on('message', (code, data) => {
         reciveMsg(code, data, token);
     });
@@ -83,20 +81,31 @@ io.on('connection', (socket) => {
         socket.removeAllListeners();
         socket.disconnect();
         user.delete(token);
-        io.to((0, tool_1.getOtherId)(token, user)).emit('message', 'leave', { code: 'leave', sender: token });
+        sendMsg({ code: 'leave', id: token });
     });
 });
+function sendMsg(data) {
+    const { code, id, target } = data;
+    let sendTo = undefined;
+    if (target) {
+        sendTo = (0, tool_1.getTargetId)(user, target);
+    }
+    else {
+        sendTo = (0, tool_1.getOtherId)(user, id);
+    }
+    console.log('sendTo :>> ', sendTo);
+    if (!sendTo || sendTo.length === 0)
+        return;
+    io.to(sendTo).emit('message', code, data);
+}
 function reciveMsg(code, data, token) {
     console.log('来自客户端的code：', code);
-    console.log('来自客户端的data：', data);
     switch (code) {
         case 'offer':
-            break;
         case 'answer':
-            break;
-        case 'candence':
-            break;
-        case 'leave':
+        case 'candidate':
+        case 'hungUp':
+            sendMsg(data);
             break;
         default:
             break;

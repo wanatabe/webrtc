@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOtherId = exports.getUserId = exports.getIPv4 = exports.uuid = void 0;
+exports.getTargetId = exports.getOtherId = exports.getUserId = exports.getIPv4 = exports.uuid = void 0;
 const uuid_1 = require("uuid");
 const os = __importStar(require("os"));
 //取得32位大写UUID字符串
@@ -53,25 +53,47 @@ exports.getIPv4 = getIPv4;
 function getUserId(user) {
     const userId = [];
     for (const key of user.keys()) {
-        userId.push(key);
+        userId.push(user.get(key));
     }
     return userId;
 }
 exports.getUserId = getUserId;
-function getOtherId(me, user) {
+function getOtherId(user, me) {
+    if (!me)
+        return getUserId(user);
+    console.log('user :>> ', user);
     const userId = [];
     for (const key of user.keys()) {
         if (typeof me === 'string' && me !== key) {
-            userId.push(key);
+            userId.push(user.get(key));
         }
         if (Array.isArray(me)) {
             for (let index = 0; index < me.length; index++) {
                 const item = me[index];
                 if (item !== key)
-                    userId.push(key);
+                    userId.push(user.get(key));
             }
         }
     }
     return userId;
 }
 exports.getOtherId = getOtherId;
+function getTargetId(user, target) {
+    if (!target)
+        return getUserId(user);
+    const userId = [];
+    for (const key of user.keys()) {
+        if (typeof target === 'string' && target === key) {
+            userId.push(user.get(key));
+        }
+        if (Array.isArray(target)) {
+            for (let index = 0; index < target.length; index++) {
+                const item = target[index];
+                if (item === key)
+                    userId.push(user.get(key));
+            }
+        }
+    }
+    return userId;
+}
+exports.getTargetId = getTargetId;

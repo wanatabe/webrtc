@@ -1,9 +1,10 @@
 import { createServer } from 'https'
 import { Server } from 'socket.io'
 import * as url from 'url'
-import { getIPv4, getOtherId, uuid } from './tool'
+import { getIPv4, getOtherId, getTargetId, uuid } from './tool'
 import * as fs from 'fs'
 import path from 'path'
+import { MsgType } from '../clint/js/type'
 
 const IPv4 = getIPv4()
 const port = 8089
@@ -47,13 +48,12 @@ io.on('connection', (socket) => {
   // 连接时触发
   /** 获取token，客户端为设置token时断开连接 */
   const token = socket.handshake.headers.token as string
-  if (!token) return socket.disconnect()
+  if (!token || !user.get(token)) return socket.disconnect()
   /** 记录用户及连接 */
-  const isLogin = typeof user.get(token)
-  if (isLogin === 'boolean') {
-    user.set(token, socket)
-  }
+
   console.log('连接成功：', token)
+  user.set(token, socket.id)
+  sendMsg({ code: 'join', id: token })
 
   socket.on('message', (code, data) => {
     reciveMsg(code, data, token)
@@ -65,21 +65,32 @@ io.on('connection', (socket) => {
     socket.disconnect()
 
     user.delete(token)
-    io.to(getOtherId(token, user)).emit('message', 'leave', { code: 'leave', sender: token })
+    sendMsg({ code: 'leave', id: token })
   })
 })
 
+function sendMsg(data: MsgType) {
+  const { code, id, target } = data
+
+  let sendTo = undefined
+  if (target) {
+    sendTo = getTargetId(user, target)
+  } else {
+    sendTo = getOtherId(user, id)
+  }
+  console.log('sendTo :>> ', sendTo)
+  if (!sendTo || sendTo.length === 0) return
+  io.to(sendTo).emit('message', code, data)
+}
+
 function reciveMsg(code: string, data: any, token: string) {
   console.log('来自客户端的code：', code)
-  console.log('来自客户端的data：', data)
   switch (code) {
     case 'offer':
-      break
     case 'answer':
-      break
-    case 'candence':
-      break
-    case 'leave':
+    case 'candidate':
+    case 'hungUp':
+      sendMsg(data)
       break
 
     default:

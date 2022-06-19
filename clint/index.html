@@ -9,17 +9,13 @@
   <body>
     <div class="webrtc">
       <div class="myStream">
-        <div class="title" @dblclick="startVideo">me</div>
+        <div class="title">me</div>
 
-        <div class="videoBox myVideo">
-          <video :srcObject="state.myUrl" autoplay></video>
-        </div>
+        <div class="videoBox caller"></div>
       </div>
       <div class="otherStream">
         <div>other</div>
-        <div class="videoBox otherVideo">
-          <video autoplay></video>
-        </div>
+        <div class="videoBox called"></div>
       </div>
     </div>
   </body>
