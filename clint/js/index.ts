@@ -8,7 +8,6 @@ function createVideo(stream: MediaStream, selectors: string) {
   video.srcObject = stream
 
   video.onloadeddata = () => {
-    console.log('开始播放 ')
     video.play()
   }
 
@@ -68,7 +67,6 @@ window.onload = async () => {
   })
   socket.on('message', async (msg, data) => {
     console.log('来自服务端的消息 ', msg)
-    console.log('data:>>>>>', data)
     switch (msg) {
       case 'join':
         await startLive(data)
@@ -137,8 +135,7 @@ function reciveAnswer(data: MsgType) {
 
 const candidateList = new Map()
 async function reciveCandidate(data: MsgType) {
-  console.log('收到候选', data.candidate)
-  console.log('收到候选', peers)
+  console.log('收到候选')
   const peer: RTCPeerConnection = peers.get(data.id)
   if (!peer) {
     let list: Map<any, any> = candidateList.get(data.id)
@@ -222,7 +219,6 @@ function handleICECandidateEvent(event: RTCPeerConnectionIceEvent, id: string) {
  */
 function handleTrackEvent(event: RTCTrackEvent) {
   const remote = document.querySelector<HTMLVideoElement>('video.remote')
-  console.log('remote :>> ')
   if (!remote) {
     createVideo(event.streams[0], 'div.called')
   } else {
@@ -268,7 +264,6 @@ function handleSignalingStateChangeEvent(id: string) {
  */
 function addTrack(stream: MediaStream, peer: RTCPeerConnection) {
   for (const track of stream.getTracks()) {
-    console.log('track------------------ :>> ', track)
     peer.addTrack(track, stream)
   }
 }
