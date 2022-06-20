@@ -39,7 +39,7 @@ httpServer.listen(port, () => {
 // 创建websocket服务
 const io = new Server(httpServer, {
   cors: {
-    origin: new RegExp(`https://${IPv4}:\\d+`),
+    origin: '*',
     credentials: true
   }
 })

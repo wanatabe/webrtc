@@ -315,12 +315,9 @@ function closeVideoCall(id: string) {
 
   if (peer) {
     peer.ontrack = null
-    peer.onremovetrack = null
-    peer.onremovestream = null
     peer.onicecandidate = null
     peer.oniceconnectionstatechange = null
     peer.onsignalingstatechange = null
-    peer.onicegatheringstatechange = null
     peer.onnegotiationneeded = null
 
     if (remoteVideo && remoteVideo.srcObject) {
